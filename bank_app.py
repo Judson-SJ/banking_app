@@ -1,5 +1,7 @@
-import datetime
-
+#import datetime
+from datetime import datetime
+now=datetime.now()
+ac_balances=0
 ''''accounts=[]
 auto_account_num=100001
 #Function for create the account
@@ -36,35 +38,64 @@ def account_num_verification():
             check=list(file.readlines([line]))
         print(check)
 account_num_verification()        '''
+
        #===GET DATA FROME USER==== 
 def get_data_create_account():
-    name=(input("Enter your name: "))
-    address=(input("Enther your address: "))
-    pin_number=(input("Enter new pin number: "))
+    name=str(input("Enter your name: "))
+    address=str(input("Enther your address: "))
+    pin_number=str(input("Enter new pin number: "))
+    return(name,address,pin_number)
+
        #===CREATE NEW ACCOUNT NUMBER====
 def create_account_number():
     with open("customer_account.txt", "r") as customer_file:
-        return f"{int(customer_file.readLines()[-1].split(",")[0][1:])+1}"
+        return f"{int(customer_file.readlines()[-1].split(",")[0][1:])+1}"
     
        #=====DEPOSIT FUNCTION=====
 def deposit():
-    #global ac_balances
-    depAmount=float(input("Enter the deposit amount: "))
-    if depAmount > 0:
-        ac_balances= ac_balances + depAmount
-        print("Successfull deposit! Your depost amount is: ", depAmount, "Now your balance is: ", ac_balances)
-    else:
-        print("Invalid deposit amount. Must be greater than 0.")    
+    global ac_balances
+    try:
+        depAmount=float(input("Enter the deposit amount: "))
+        if depAmount > 0:
+            ac_balances= ac_balances + depAmount
+            print("Successfull deposit! Your depost amount is: ", depAmount, "Now your balance is: ", ac_balances)
+        else:
+            print("Invalid deposit amount. Must be greater than 0.")
+    except ValueError:
+        print("Invalid Input..")            
 
         #=====WITHDRAWAL FUNCTION=====
 def Withdrawal():
     #global ac_balances
-    withAmount=float(input("Enter the withdrawal amount: "))
-    if withAmount <= 0:
-        print("Invalid widhrawal amount. Must be greater than 0.")
-    elif withAmount <= ac_balances:
-        ac_balances= ac_balances - withAmount
-        print("Successfull withdrawal! Your withdrawal amount is: ", withAmount, "Now your balance is: ", ac_balances)
-    else:
-        print("Insufficien balance.")
+    try:
+        withAmount=float(input("Enter the withdrawal amount: "))
+        if withAmount <= 0:
+            print("Invalid widhrawal amount. Must be greater than 0.")
+        elif withAmount <= ac_balances:
+            ac_balances= ac_balances - withAmount
+            print("Successfull withdrawal! Your withdrawal amount is: ", withAmount, "Now your balance is: ", ac_balances)
+        else:
+            print("Insufficien balance.")
+    except ValueError:
+        print("Invalid input..")
+
+def transaction():
+    with open("transactions.txt", "a") as transactions_file:
+        transactions_file.write()
+
+
+#=====CREATE CUSTOMER ACCOUNT=====
+def create_customer_account():
+    get_data_create_account()
+    create_account_number()
+    deposit()
+    with open("customer_account.txt", "a") as customer_file:
+        customer_file.writelines f"{create_account_number()},{get_data_create_account(name)},
+        {get_data_create_account(address)},{get_data_create_account(pin_number)},{deposit(depAmount)}"
+
+    with open("transactions.txt", "a") as transactions_file:
+        transactions_file.write(f"{create_account_number()}, D ,{deposit(depAmount)},{now}")    
+
+create_customer_account()     
+
         
