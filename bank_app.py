@@ -42,7 +42,6 @@ def deposit():
                         depAmount = float(input("Enter The Deposit Amount: "))
                         if depAmount > 0:
                             new_balance = latest_balance + depAmount
-                            #now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                             print("✅  Successful deposit! Your Deposit Amount Is:", depAmount)
                             print("💰  Now Your Balance Is:", new_balance)
 
@@ -103,7 +102,67 @@ def Withdrawal():
                                 print("❌  Invalid Input..")
                             return                   
         print("❌  Incorrect Account Number or Password!")
-                          
+        
+#=====CHECK BALANCE=======
+def check_balance():
+    get_customer_account_number = input("Enter The Account Number: ")
+    get_customer_password = input("🗝️  Enter The Account Password: ")
+
+    # Verify account
+    with open("customers_accounts.txt", "r") as customers_file:
+        lines = customers_file.readlines()
+        for line in lines:
+            fields = line.strip().split(',')
+            if len(fields) < 4:
+                continue
+            account_number = fields[0]
+            customer_password = fields[3]
+
+            if account_number == get_customer_account_number and customer_password == get_customer_password:
+                # Get latest balance from transactions.txt
+                latest_balance = 0.0
+                with open("transactions.txt", "r") as transactions_file:
+                    t_lines = transactions_file.readlines()
+                    for t_line in reversed(t_lines):
+                        t_fields = t_line.strip().split(',')
+                        if len(t_fields) >= 4 and t_fields[0] == get_customer_account_number:
+                            try:
+                                latest_balance = float(t_fields[3])
+                            except ValueError:
+                                pass
+                            print("💴  Now Your Balance Is: ", latest_balance)
+                            break   
+                        
+#======TRANSACTION HISTORY========= 
+def transaction_history():
+    get_customer_account_number = input("Enter The Account Number: ")
+    get_customer_password = input("🗝️  Enter The Account Password: ")
+
+    # Verify account credentials
+    with open("customers_accounts.txt", "r") as customers_file:
+        lines = customers_file.readlines()
+        for line in lines:
+            fields = line.strip().split(',')
+            if len(fields) < 4:
+                continue
+            account_number = fields[0]
+            customer_password = fields[3]
+
+            if account_number == get_customer_account_number and customer_password == get_customer_password:
+                print("\n📜 Transaction History:")
+                with open("transactions.txt", "r") as transactions_file:
+                    t_lines = transactions_file.readlines()
+                    found = False
+                    for t_line in t_lines:
+                        t_fields = t_line.strip().split(',')
+                        if len(t_fields) >= 4 and t_fields[0] == get_customer_account_number:
+                            print(f"📌 Type: {t_fields[1]}, Amount: {t_fields[2]}, Balance: {t_fields[3]}, Date: {t_fields[4]}")
+                            found = True
+                    if not found:
+                        print("ℹ️  No transactions found for this account.")
+                return  # Exit after showing history
+
+    print("❌ Incorrect Account Number or Password!")
 
 #=====CREATE CUSTOMER ACCOUNT=====
 def create_customer_account():
@@ -133,7 +192,7 @@ def create_customer_account():
                     continue
                 return
 
-#======MAIN MENUE===========
+#======MAIN MENU===========
 def main_menu():
     while True:
             print("========Welcome To The Banking Application======")
@@ -152,7 +211,7 @@ def main_menu():
             else:
                 print("❌  Invalid Choose! Please Choose 1-3...")
         
-#======ADMIN MENUE===========
+#======ADMIN MENU===========
 def admin_login():
     get_admin_user_name = str(input("Enter The Admin User Name: "))
     get_admin_password = str(input("🗝️  Enter The Admin Password: "))
@@ -161,12 +220,12 @@ def admin_login():
         if  admin_user_name == get_admin_user_name and admin_password == get_admin_password:
             print("========Welcome To The Banking Application======")
             print("...............This Is Admin's Menu............")
-            print("1️⃣  For Create Account")
-            print("2️⃣  For Deposit Money")
-            print("3️⃣  For Withdrawal Money")
-            print("4️⃣  For Check Balance")
-            print("5️⃣  For Transaction History")
-            print("6️⃣  For Back To Main Manu")
+            print("1️⃣  Create Account")
+            print("2️⃣  Deposit Money")
+            print("3️⃣  Withdraw Money")
+            print("4️⃣  Check Balance")
+            print("5️⃣  Transaction History")
+            print("6️⃣  Back To Main Manu")
             choose = input("Enter your choose (1,2,3,4,5,6): ")
             if choose == "1":
                 create_customer_account()
@@ -175,11 +234,10 @@ def admin_login():
             elif choose == "3":
                 Withdrawal()
             elif choose == "4":
-                print("Check balance")
+                check_balance()
             elif choose == "5":
-                print("Transaction History") 
+                transaction_history() 
             elif choose == "6":       
-                #print("🤝  Thank You For Choosing Our Service! ❤️")
                 break
             else:
                 print("❌  Invalid Choose! Please Choose 1-6...")
@@ -187,7 +245,7 @@ def admin_login():
                 print("❌  Incorrect Username or password! Please Enter The Correct Username and Password.")
                 break
 
-#========CUSTOMER MENUE========
+#========CUSTOMER MENU========
 def customer_login():
     get_customer_account_number = input("Enter The Account Number: ")
     get_customer_password = input("🗝️  Enter The Account Password: ")
@@ -197,38 +255,42 @@ def customer_login():
         for line in lines:
             fields = line.strip().split(',')
             if len(fields) < 4:
-                continue  # skip malformed lines
-            account_number = fields[0]
-            customer_password = fields[3]         
-    while True:
-        if account_number == get_customer_account_number and customer_password == get_customer_password:
-            print("========Welcome To The Banking Application======")
-            print("...............This Is Customer's Menue............")
-            print("1️⃣  For Deposit Money")
-            print("2️⃣  For Withdrawal Money")
-            print("3️⃣  For Check Balance")
-            print("4️⃣  For Transaction History")
-            print("5️⃣  For Back To Main Manu")
-            choose = input("Enter your choose (1,2,3,4,5): ")
-            if choose == "1":
-                deposit()
-            elif choose == "2":
-                Withdrawal()
-            elif choose == "3":
-                print("Check balance")
-            elif choose == "4":
-                print("Transaction History") 
-            elif choose == "5":       
-                #print("🤝  Thank You For Choosing Our Service! ❤️")
-                break
-            else:
-                print("❌  Invalid Choose! Please Choose 1-5...")
-        else:
-                print("❌  Incorrect Username or password! Please Enter The Correct Username and Password.")
-                break                        
+                continue
 
-#create_customer_account()
-main_menu()     
+            account_number = fields[0]
+            customer_password = fields[3]
+
+            if account_number == get_customer_account_number and customer_password == get_customer_password:
+                print("✅ Login Successful!")
+                while True:
+                    print("\n======== Welcome To The Banking Application ======")
+                    print("............... Customer Menu ...............")
+                    print("1️⃣  Deposit Money")
+                    print("2️⃣  Withdraw Money")
+                    print("3️⃣  Check Balance")
+                    print("4️⃣  Transaction History")
+                    print("5️⃣  Back To Main Menu")
+
+                    choose = input("Enter your choice (1-5): ")
+                    if choose == "1":
+                        deposit()
+                    elif choose == "2":
+                        Withdrawal()
+                    elif choose == "3":
+                        check_balance()
+                    elif choose == "4":
+                        transaction_history()  
+                    elif choose == "5":
+                        return
+                    else:
+                        print("❌ Invalid Choice! Please select 1-5.")
+                return 
+
+    print("❌ Incorrect Account Number or Password! Please try again.") 
+                          
+main_menu()
+#create_customer_account()     
 #deposit()
 #Withdrawal()
+#transaction_history()
         
