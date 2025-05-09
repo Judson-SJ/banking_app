@@ -1,8 +1,0 @@
-100001,judson,jaffan,1010,100.002
-100002,('kkkk', 'hhhh', '2020'),None
-100003,('hkhiu', [1], [2]),None
-100004,Jksd,adfg,23232000.0
-100005,asha,vavuniya,21220
-100006,jhjhdvdl,khjhd,09870
-100007,khhe,guifgfw,21120
-100008,jihuigg4,higffe,2121212112.0

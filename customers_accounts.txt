@@ -1,0 +1,11 @@
+100001,Judson,Jaffna,1010,1000.0
+100002,Jackson,Vavuniya,1111,2000.0
+100003,Johnson,Mannar,1212,1000.0
+100004,Josuva,Mannar,2222,3000.0
+100005,Asha,Kilinochchi,5555,2000.0
+100006,Vimal,Madhawachi,4444,1500.0
+100007,Amal,Kandy,2112,2000.0
+100008,Suthan,Mullaithivu,2121,2500.0
+100009,Netha,Jaffna,1212,1000.0
+100010,Nerias,Jaffna,1001,5000.0
+100011,Abishan,Mannar,1111,2500.0
