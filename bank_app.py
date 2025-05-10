@@ -1,36 +1,44 @@
 from datetime import datetime
 now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-admin_user_name = "Admin"
-admin_password = "Admin@123"
 
-#===CREATE NEW ACCOUNT NUMBER====
+admin_user_name = "Admin" # Admin user name
+admin_password = "Admin@123" # Admin password
+
+#====CREATE NEW ACCOUNT NUMBER=====
 def create_account_number():
     with open("customers_accounts.txt", "r") as customers_file:
-        return f"{int(customers_file.readlines()[-1].split(",")[0])+1}"
+        return f"{int(customers_file.readlines()[-1].split(",")[0])+1}" # Find the last account number and generate next new account number
     
-#=====DEPOSIT FUNCTION=====
-def deposit():
+#======VERIFY ACCOUNT======
+def verification():    
     get_customer_account_number = input("Enter The Account Number: ")
     get_customer_password = input("🗝️  Enter The Account Password: ")
 
-    # Verify account
     with open("customers_accounts.txt", "r") as customers_file:
-        lines = customers_file.readlines()
-        for line in lines:
-            fields = line.strip().split(',')
-            if len(fields) < 4:
+        lines = customers_file.readlines()      # Lines in customer file
+        for line in lines:                      # One line in lines 
+            fields = line.strip().split(',')    # Split line by (,)
+            if len(fields) < 4:                 # Lenth of line
                 continue
-            account_number = fields[0]
-            customer_password = fields[3]
 
-            if account_number == get_customer_account_number and customer_password == get_customer_password:
+            account_number = fields[0]          # Define the value to variable
+            customer_password = fields[3]
+    
+            if account_number == get_customer_account_number and customer_password == get_customer_password: # Verify the account number password
+                return True , get_customer_account_number # Return the values for using another function
+    return False , None
+      
+#=====DEPOSIT FUNCTION=====
+def deposit():
+        done,ac_num = verification()
+        if done:
                 # Get latest balance from transactions.txt
                 latest_balance = 0.0
                 with open("transactions.txt", "r") as transactions_file:
                     t_lines = transactions_file.readlines()
-                    for t_line in reversed(t_lines):
+                    for t_line in reversed(t_lines): # Read lines by reversed
                         t_fields = t_line.strip().split(',')
-                        if len(t_fields) >= 4 and t_fields[0] == get_customer_account_number:
+                        if len(t_fields) >= 4 and t_fields[0] == ac_num: # Verify the entered account number = account number from transaction.txt
                             try:
                                 latest_balance = float(t_fields[3])
                             except ValueError:
@@ -46,39 +54,26 @@ def deposit():
                             print("💰  Now Your Balance Is:", new_balance)
 
                             with open("transactions.txt", "a") as transactions_file:
-                                transactions_file.write(f"{get_customer_account_number},DEPOSIT,{depAmount},{new_balance},{now}\n")
+                                transactions_file.write(f"{ac_num},DEPOSIT,{depAmount},{new_balance},{now}\n")
                             return  # Exit after successful deposit
                         else:
                             print("💴  Invalid Deposit Amount. Must Be Greater Than 0.")
                     except ValueError:
                         print("❌  Invalid input. Please enter a valid number.")
-                return  
-
-        print("❌  Incorrect Account Number or Password!")
+        else:
+            print("❌  Incorrect Account Number or Password!")
 
 #=====WITHDRAWAL FUNCTION=====
 def Withdrawal():
-    get_customer_account_number = input("Enter The Account Number: ")
-    get_customer_password = input("🗝️  Enter The Account Password: ")
-
-    # Verify account
-    with open("customers_accounts.txt", "r") as customers_file:
-        lines = customers_file.readlines()
-        for line in lines:
-            fields = line.strip().split(',')
-            if len(fields) < 4:
-                continue
-            account_number = fields[0]
-            customer_password = fields[3]
-
-            if account_number == get_customer_account_number and customer_password == get_customer_password:
+        done,ac_num = verification()
+        if done:
                 # Get latest balance from transactions.txt
                 latest_balance = 0.0
                 with open("transactions.txt", "r") as transactions_file:
                     t_lines = transactions_file.readlines()
-                    for t_line in reversed(t_lines):
+                    for t_line in reversed(t_lines): # Read lines by reversed
                         t_fields = t_line.strip().split(',')
-                        if len(t_fields) >= 4 and t_fields[0] == get_customer_account_number:
+                        if len(t_fields) >= 4 and t_fields[0] == ac_num: # Verify the entered account number = account number from transaction.txt
                             try:
                                 latest_balance = float(t_fields[3])
                             except ValueError:
@@ -87,82 +82,72 @@ def Withdrawal():
                 while True:        
                             try:
                                 withAmount=float(input("Enter The Withdrawal Amount: "))
-                                if withAmount <= 0:
+                                if withAmount > 0:
+                                    if withAmount <= latest_balance:
+                                        latest_balance= latest_balance - withAmount
+                                        print("✅  Successfull Withdrawal! Your Withdrawal Amount Is: ", withAmount, "Now Your Balance Is: ", latest_balance)
+                                        with open("transactions.txt", "a") as transactions_file:
+                                                transactions_file.write(f"{ac_num},WITHDRAWAL,{withAmount},{latest_balance},{now}\n")
+                                        return  # Exit after successful withdrawal
+                                    else:
+                                        print("🪫💵 Insufficient Balance.")    
+                                else:    
                                     print("💴  Invalid Widhrawal Amount. Must Be Greater Than 0.")
-                                elif withAmount <= latest_balance:
-                                    latest_balance= latest_balance - withAmount
-                                    print("✅  Successfull Withdrawal! Your Withdrawal Amount Is: ", withAmount, "Now Your Balance Is: ", latest_balance)
-                                    with open("transactions.txt", "a") as transactions_file:
-                                            transactions_file.write(f"{get_customer_account_number},WITHDRAWAL,{withAmount},{latest_balance},{now}\n")
-                                            return  # Exit after successful withdrawal
-                                else:
-                                    print("🪫💵 Insufficient Balance.")
-                                    continue
                             except ValueError:
-                                print("❌  Invalid Input..")
-                            return                   
-        print("❌  Incorrect Account Number or Password!")
+                                print("❌  Invalid Input. Please enter a valid number..") 
+        else:                          
+            print("❌  Incorrect Account Number or Password!")
         
 #=====CHECK BALANCE=======
 def check_balance():
-    get_customer_account_number = input("Enter The Account Number: ")
-    get_customer_password = input("🗝️  Enter The Account Password: ")
-
-    # Verify account
-    with open("customers_accounts.txt", "r") as customers_file:
-        lines = customers_file.readlines()
-        for line in lines:
-            fields = line.strip().split(',')
-            if len(fields) < 4:
-                continue
-            account_number = fields[0]
-            customer_password = fields[3]
-
-            if account_number == get_customer_account_number and customer_password == get_customer_password:
+        done,ac_num = verification()
+        if done:
+                # Get latest balance from transactions.txt
+                latest_balance = 0.0
+                with open("transactions.txt", "r") as transactions_file:
+                    t_lines = transactions_file.readlines()
+                    for t_line in reversed(t_lines): # Read lines by reversed
+                        t_fields = t_line.strip().split(',')
+                        if len(t_fields) >= 4 and t_fields[0] == ac_num: # Verify the entered account number = account number from transaction.txt
+                            try:
+                                latest_balance = float(t_fields[3])
+                            except ValueError:
+                                pass
+                            break
                 # Get latest balance from transactions.txt
                 latest_balance = 0.0
                 with open("transactions.txt", "r") as transactions_file:
                     t_lines = transactions_file.readlines()
                     for t_line in reversed(t_lines):
                         t_fields = t_line.strip().split(',')
-                        if len(t_fields) >= 4 and t_fields[0] == get_customer_account_number:
+                        if len(t_fields) >= 4 and t_fields[0] == ac_num:
                             try:
                                 latest_balance = float(t_fields[3])
                             except ValueError:
                                 pass
                             print("💴  Now Your Balance Is: ", latest_balance)
-                            break   
+                            break 
+        else:                          
+            print("❌  Incorrect Account Number or Password!")                  
                         
 #======TRANSACTION HISTORY========= 
 def transaction_history():
-    get_customer_account_number = input("Enter The Account Number: ")
-    get_customer_password = input("🗝️  Enter The Account Password: ")
-
-    # Verify account credentials
-    with open("customers_accounts.txt", "r") as customers_file:
-        lines = customers_file.readlines()
-        for line in lines:
-            fields = line.strip().split(',')
-            if len(fields) < 4:
-                continue
-            account_number = fields[0]
-            customer_password = fields[3]
-
-            if account_number == get_customer_account_number and customer_password == get_customer_password:
+        done,ac_num = verification()
+        if done:
                 print("\n📜 Transaction History:")
                 with open("transactions.txt", "r") as transactions_file:
                     t_lines = transactions_file.readlines()
                     found = False
                     for t_line in t_lines:
                         t_fields = t_line.strip().split(',')
-                        if len(t_fields) >= 4 and t_fields[0] == get_customer_account_number:
+                        if len(t_fields) >= 4 and t_fields[0] == ac_num:
                             print(f"📌 Type: {t_fields[1]}, Amount: {t_fields[2]}, Balance: {t_fields[3]}, Date: {t_fields[4]}")
                             found = True
                     if not found:
                         print("ℹ️  No transactions found for this account.")
                 return  # Exit after showing history
-
-    print("❌ Incorrect Account Number or Password!")
+        else:
+            print("❌ Incorrect Account Number or Password!")
 
 #=====CREATE CUSTOMER ACCOUNT=====
 def create_customer_account():
@@ -197,9 +182,9 @@ def main_menu():
     while True:
             print("========Welcome To The Banking Application======")
             print("...............This Is Main Menu............")
-            print("1️⃣  For Admin Menu")
-            print("2️⃣  For Customer Menu")
-            print("3️⃣  For Exit")
+            print("1️⃣  Admin Menu")
+            print("2️⃣  Customer Menu")
+            print("3️⃣  Exit")
             choose = input("Enter your choose (1,2,3): ")
             if choose == "1":
                 admin_login()
@@ -247,20 +232,7 @@ def admin_login():
 
 #========CUSTOMER MENU========
 def customer_login():
-    get_customer_account_number = input("Enter The Account Number: ")
-    get_customer_password = input("🗝️  Enter The Account Password: ")
-
-    with open("customers_accounts.txt", "r") as customers_file:
-        lines = customers_file.readlines()
-        for line in lines:
-            fields = line.strip().split(',')
-            if len(fields) < 4:
-                continue
-
-            account_number = fields[0]
-            customer_password = fields[3]
-
-            if account_number == get_customer_account_number and customer_password == get_customer_password:
+            if verification():
                 print("✅ Login Successful!")
                 while True:
                     print("\n======== Welcome To The Banking Application ======")
@@ -284,9 +256,8 @@ def customer_login():
                         return
                     else:
                         print("❌ Invalid Choice! Please select 1-5.")
-                return 
-
-    print("❌ Incorrect Account Number or Password! Please try again.") 
+            else:
+                print("❌ Incorrect Account Number or Password! Please try again.") 
                           
 main_menu()
 #create_customer_account()     
