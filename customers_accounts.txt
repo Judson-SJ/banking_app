@@ -1,4 +1,4 @@
-100001,Judson,Jaffna,1010,1000.0
+100001,Judson,Jaffna,1010,10000.0
 100002,Jackson,Vavuniya,1111,2000.0
 100003,Johnson,Mannar,1212,1000.0
 100004,Josuva,Mannar,2222,3000.0

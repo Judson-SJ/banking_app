@@ -4,6 +4,39 @@ now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 admin_user_name = "Admin" # Admin user name
 admin_password = "Admin@123" # Admin password
 
+
+#  For viva current date
+
+
+#======= SHOW THE CURRENT DATE====== 
+def current_date():
+     now=datetime.now().strftime("%Y-%m-%d")
+     print("Current Date: " , now)
+     
+'''
+#========CHANGE PASSWORD=======     
+def change_password():
+     done,ac_num,name = verification()
+     if done:
+        get_password = input("Enter the new password. (Must more the 6 characters)")
+        if len(get_password) > 6:
+            con_password = input("Re enter the password")
+            if get_password == con_password:
+                 with open("customers_accounts.txt" , "a+") as c_file:
+                      lines = c_file.readlines()
+                      for line in lines:
+                           fields = line.strip().split(",")
+                           if len(fields) < 4:
+                                continue
+                           if ac_num == fields[0]:
+                                c_file.write(f"{ac_num},{name},{address},{get_password},{balance}")                                                  
+        else:
+             print("Password must be 6 characters.")
+             return
+     else:
+          return               
+                      '''
+
 #====CREATE NEW ACCOUNT NUMBER=====
 def create_account_number():
     with open("customers_accounts.txt", "r") as customers_file:
@@ -23,14 +56,15 @@ def verification():
 
             account_number = fields[0]          # Define the value to variable
             customer_password = fields[3]
+            customer_name = fields[1]
     
             if account_number == get_customer_account_number and customer_password == get_customer_password: # Verify the account number password
-                return True , get_customer_account_number # Return the values for using another function
+                return True , get_customer_account_number, customer_name # Return the values for using another function
     return False , None
       
 #=====DEPOSIT FUNCTION=====
 def deposit():
-        done,ac_num = verification()
+        done,ac_num,name = verification()
         if done:
                 # Get latest balance from transactions.txt
                 latest_balance = 0.0
@@ -65,7 +99,7 @@ def deposit():
 
 #=====WITHDRAWAL FUNCTION=====
 def Withdrawal():
-        done,ac_num = verification()
+        done,ac_num,name = verification()
         if done:
                 # Get latest balance from transactions.txt
                 latest_balance = 0.0
@@ -82,15 +116,21 @@ def Withdrawal():
                 while True:        
                             try:
                                 withAmount=float(input("Enter The Withdrawal Amount: "))
-                                if withAmount > 0:
-                                    if withAmount <= latest_balance:
-                                        latest_balance= latest_balance - withAmount
-                                        print("✅  Successfull Withdrawal! Your Withdrawal Amount Is: ", withAmount, "Now Your Balance Is: ", latest_balance)
-                                        with open("transactions.txt", "a") as transactions_file:
-                                                transactions_file.write(f"{ac_num},WITHDRAWAL,{withAmount},{latest_balance},{now}\n")
-                                        return  # Exit after successful withdrawal
+                                if withAmount > 0: 
+
+                                    if latest_balance > 5000.00:  # For viva balance warning
+                                         
+                                        if withAmount <= latest_balance:
+                                            latest_balance= latest_balance - withAmount
+                                            print("✅  Successfull Withdrawal! Your Withdrawal Amount Is: ", withAmount, "Now Your Balance Is: ", latest_balance)
+                                            with open("transactions.txt", "a") as transactions_file:
+                                                    transactions_file.write(f"{ac_num},WITHDRAWAL,{withAmount},{latest_balance},{now}\n")
+                                            return  # Exit after successful withdrawal
+                                        else:
+                                            print("🪫💵 Insufficient Balance.")
                                     else:
-                                        print("🪫💵 Insufficient Balance.")    
+                                         print("⚠️  Warning: Balance below Rs.5000 !")
+                                         return            
                                 else:    
                                     print("💴  Invalid Widhrawal Amount. Must Be Greater Than 0.")
                             except ValueError:
@@ -100,7 +140,7 @@ def Withdrawal():
         
 #=====CHECK BALANCE=======
 def check_balance():
-        done,ac_num = verification()
+        done,ac_num,name = verification()
         if done:
                 # Get latest balance from transactions.txt
                 latest_balance = 0.0
@@ -132,7 +172,7 @@ def check_balance():
                         
 #======TRANSACTION HISTORY========= 
 def transaction_history():
-        done,ac_num = verification()
+        done,ac_num,name = verification()
         if done:
                 print("\n📜 Transaction History:")
                 with open("transactions.txt", "r") as transactions_file:
@@ -210,8 +250,9 @@ def admin_login():
             print("3️⃣  Withdraw Money")
             print("4️⃣  Check Balance")
             print("5️⃣  Transaction History")
-            print("6️⃣  Back To Main Manu")
-            choose = input("Enter your choose (1,2,3,4,5,6): ")
+            print("6️⃣  Show Current Date")
+            print("7️⃣  Back To Main Manu")
+            choose = input("Enter your choose (1,2,3,4,5,6,7): ")
             if choose == "1":
                 create_customer_account()
             elif choose == "2":
@@ -221,29 +262,34 @@ def admin_login():
             elif choose == "4":
                 check_balance()
             elif choose == "5":
-                transaction_history() 
-            elif choose == "6":       
+                transaction_history()
+            elif choose == "6":
+                current_date()     
+            elif choose == "7":       
                 break
             else:
-                print("❌  Invalid Choose! Please Choose 1-6...")
+                print("❌  Invalid Choose! Please Choose 1-7...")
         else:
                 print("❌  Incorrect Username or password! Please Enter The Correct Username and Password.")
                 break
 
 #========CUSTOMER MENU========
 def customer_login():
-            if verification():
+            done,ac,num,name = verification()
+            if done:
                 print("✅ Login Successful!")
                 while True:
                     print("\n======== Welcome To The Banking Application ======")
                     print("............... Customer Menu ...............")
+                    print("...............Hello! ", name , "...........")
                     print("1️⃣  Deposit Money")
                     print("2️⃣  Withdraw Money")
                     print("3️⃣  Check Balance")
                     print("4️⃣  Transaction History")
-                    print("5️⃣  Back To Main Menu")
+                    print("5️⃣  Show Current Date")
+                    print("6️⃣  Back To Main Menu")
 
-                    choose = input("Enter your choice (1-5): ")
+                    choose = input("Enter your choice (1-6): ")
                     if choose == "1":
                         deposit()
                     elif choose == "2":
@@ -253,9 +299,11 @@ def customer_login():
                     elif choose == "4":
                         transaction_history()  
                     elif choose == "5":
+                        current_date()     
+                    elif choose == "6":
                         return
                     else:
-                        print("❌ Invalid Choice! Please select 1-5.")
+                        print("❌ Invalid Choice! Please select 1-6.")
             else:
                 print("❌ Incorrect Account Number or Password! Please try again.") 
                           
